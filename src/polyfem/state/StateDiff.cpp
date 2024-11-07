@@ -34,6 +34,8 @@
 
 #include <fstream>
 
+#include <ipc/utils/eigen_ext.hpp>
+
 using namespace polyfem::basis;
 
 namespace polyfem
@@ -169,7 +171,7 @@ namespace polyfem
 				log_and_throw_adjoint_error("Differentiable transient linear solve is not supported!");
 
 			StiffnessMatrix tmp_hess;
-			solve_data.nl_problem->set_project_to_psd(false);
+			solve_data.nl_problem->set_project_to_psd(ipc::PSDProjectionMethod::NONE);
 			solve_data.nl_problem->FullNLProblem::solution_changed(sol);
 			solve_data.nl_problem->FullNLProblem::hessian(sol, tmp_hess);
 			hessian.setZero();
@@ -186,7 +188,7 @@ namespace polyfem
 			}
 			else
 			{
-				solve_data.nl_problem->set_project_to_psd(false);
+				solve_data.nl_problem->set_project_to_psd(ipc::PSDProjectionMethod::NONE);
 				Eigen::VectorXd reduced;
 				if (is_homogenization())
 				{

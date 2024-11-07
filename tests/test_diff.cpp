@@ -523,7 +523,7 @@ TEST_CASE("shape-neumann-nodes", "[test_adjoint]")
 
 // 	double eps = 1e-7;
 
-// 	state.solve_data.body_form->set_project_to_psd(false);
+// 	state.solve_data.body_form->set_project_to_psd(ipc::PSDProjectionMethod::NONE);
 
 // 	std::vector<Eigen::MatrixXd> hess_vec;
 // 	for (int i = 1; i <= timesteps; ++i)

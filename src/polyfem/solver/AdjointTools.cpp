@@ -24,6 +24,8 @@
 
 #include <polyfem/time_integrator/BDF.hpp>
 
+#include <ipc/utils/eigen_ext.hpp>
+
 /*
 Reminders:
 
@@ -644,7 +646,7 @@ namespace polyfem::solver
 		dJ_shape_homogenization_adjoint_term(state, sol, adjoint, one_form);
 
 		StiffnessMatrix hessian;
-		homo_problem->set_project_to_psd(false);
+		homo_problem->set_project_to_psd(ipc::PSDProjectionMethod::NONE);
 		homo_problem->FullNLProblem::hessian(sol, hessian);
 		Eigen::VectorXd partial_term = full_adjoint.transpose() * hessian;
 		partial_term = state.basis_nodes_to_gbasis_nodes * utils::flatten(utils::unflatten(partial_term, dim) * state.diff_cached.disp_grad());
