@@ -139,7 +139,6 @@ target_compile_definitions(polyfem PUBLIC -DEIGEN_STACK_ALLOCATION_LIMIT=0)
 target_compile_definitions(polyfem PUBLIC -DPOLYFEM_SMALL_N=${POLYFEM_SMALL_N})
 target_compile_definitions(polyfem PUBLIC -DPOLYFEM_BIG_N=${POLYFEM_BIG_N})
 
-# Add JSON Rule to the build dir
 set(POLYFEM_JSON_SPEC_DIR "${PROJECT_SOURCE_DIR}/json-specs")
 target_compile_definitions(polyfem PUBLIC POLYFEM_JSON_SPEC_DIR="${POLYFEM_JSON_SPEC_DIR}")
 target_compile_definitions(polyfem PUBLIC POLYFEM_INPUT_SPEC="${POLYFEM_JSON_SPEC_DIR}/input-spec.json")
@@ -149,35 +148,6 @@ target_compile_definitions(polyfem PUBLIC POLYFEM_OBJECTIVE_INPUT_SPEC="${POLYFE
 if (MSVC)
     add_compile_options(/bigobj)
 endif ()
-
-################################################################################
-# CUDA
-################################################################################
-
-if(IPC_TOOLKIT_WITH_CUDA OR POLYSOLVE_WITH_CUSOLVER)
-    include(CheckLanguage)
-    check_language(CUDA)
-    if(CMAKE_CUDA_COMPILER)
-        enable_language(CUDA)
-    else()
-        message(FATAL_ERROR "No CUDA support found!")
-    endif()
-
-    set_target_properties(polyfem PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-
-    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24.0")
-        set(CMAKE_CUDA_ARCHITECTURES "native")
-        set_target_properties(ipc_toolkit PROPERTIES CUDA_ARCHITECTURES "native")
-    else()
-        include(FindCUDA/select_compute_arch)
-        CUDA_DETECT_INSTALLED_GPUS(CUDA_ARCH_LIST)
-        string(STRIP "${CUDA_ARCH_LIST}" CUDA_ARCH_LIST)
-        string(REPLACE " " ";" CUDA_ARCH_LIST "${CUDA_ARCH_LIST}")
-        string(REPLACE "." "" CUDA_ARCH_LIST "${CUDA_ARCH_LIST}")
-        set(CMAKE_CUDA_ARCHITECTURES ${CUDA_ARCH_LIST})
-        set_target_properties(ipc_toolkit PROPERTIES CUDA_ARCHITECTURES "${CUDA_ARCH_LIST}")
-    endif()
-endif()
 
 ################################################################################
 # Required libraries
@@ -276,6 +246,35 @@ target_link_libraries(polyfem PUBLIC units::units)
 # YAML library
 include(yaml)
 target_link_libraries(polyfem PUBLIC yaml-cpp::yaml-cpp)
+
+################################################################################
+# CUDA
+################################################################################
+
+if(IPC_TOOLKIT_WITH_CUDA OR POLYSOLVE_WITH_CUSOLVER)
+    include(CheckLanguage)
+    check_language(CUDA)
+    if(CMAKE_CUDA_COMPILER)
+        enable_language(CUDA)
+    else()
+        message(FATAL_ERROR "No CUDA support found!")
+    endif()
+
+    set_target_properties(polyfem PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+
+    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24.0")
+        set(CMAKE_CUDA_ARCHITECTURES "native")
+        set_target_properties(ipc_toolkit PROPERTIES CUDA_ARCHITECTURES "native")
+    else()
+        include(FindCUDA/select_compute_arch)
+        CUDA_DETECT_INSTALLED_GPUS(CUDA_ARCH_LIST)
+        string(STRIP "${CUDA_ARCH_LIST}" CUDA_ARCH_LIST)
+        string(REPLACE " " ";" CUDA_ARCH_LIST "${CUDA_ARCH_LIST}")
+        string(REPLACE "." "" CUDA_ARCH_LIST "${CUDA_ARCH_LIST}")
+        set(CMAKE_CUDA_ARCHITECTURES ${CUDA_ARCH_LIST})
+        set_target_properties(ipc_toolkit PROPERTIES CUDA_ARCHITECTURES "${CUDA_ARCH_LIST}")
+    endif()
+endif()
 
 ################################################################################
 # Optional libraries
